@@ -1,0 +1,17 @@
+version: "3.5"
+
+services:
+  
+  go-pigeon:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - .:/go/src/github.com/arkrozycki/go-pigeon
+      - go-modules:/go/pkg/mod
+    working_dir: /go/src/github.com/arkrozycki/go-pigeon
+    restart: on-failure
+
+volumes:
+  go-modules:

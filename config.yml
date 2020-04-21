@@ -1,0 +1,23 @@
+connection:
+  host: "host.docker.internal"
+  port: "5672"
+  user: "rabbitmq"
+  pass: "rabbitmq"
+
+publisher:
+  exchange: 
+    name: "global_tx"
+    type: "topic"
+    durable: true
+    autoDelete: false
+
+consumer:
+  exchange:
+    name: "global_tx"
+    type: "topic"
+    durable: true
+    autoDelete: false
+  queue: "test_pigeon_q"
+  bindings: 
+    - "cmd.*.mts.*"
+    - "evt.*.mts.*"
