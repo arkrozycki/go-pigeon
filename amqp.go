@@ -40,3 +40,17 @@ func CheckExchangeExists(ch *amqp.Channel, exchange ExchangeConfig) error {
 	// (name, kind string, durable, autoDelete, internal, noWait bool, args Table)
 	return err
 }
+
+func Publish(ch *amqp.Channel, e *ExchangeConfig, routingKey string, msg []byte) error {
+	err := ch.Publish(
+		e.Name,
+		routingKey,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        msg,
+		})
+
+	return err
+}

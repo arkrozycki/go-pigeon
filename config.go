@@ -34,7 +34,7 @@ type ConsumerConfig struct {
 	Bindings []string
 }
 
-// Get will retrieve the configuration file at the location (f).
+// GetConf will retrieve the configuration file at the location (f).
 func GetConf(f string) (Config, error) {
 	var conf Config
 	viper.SetConfigFile(f)
