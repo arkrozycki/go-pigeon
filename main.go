@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"go/importer"
 	"os"
 	"sync"
 
@@ -37,15 +35,6 @@ func main() {
 	wg.Add(1)
 	go Serve(":8080", &conf, &wg)
 	wg.Wait()
-
-	pkg, err := importer.Default().Import("protorepo/message-transfer")
-	if err != nil {
-		fmt.Println("error:", err)
-		return
-	}
-	for _, declName := range pkg.Scope().Names() {
-		fmt.Println(declName)
-	}
 
 }
 

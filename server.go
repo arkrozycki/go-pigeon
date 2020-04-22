@@ -18,7 +18,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	err = JSONPayloadToProto(body, s.conf)
+	err = JSONPayloadToProto("MessageTransferRequested", body, s.conf)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -31,7 +31,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func Serve(port string, conf *Config, wg *sync.WaitGroup) {
-	log.Info().Msg("OK ... REST API")
+	log.Info().Msgf("OK ... REST API ON %s\n", port)
 	s := &server{conf}
 	http.Handle("/", s)
 	log.Fatal().Err(http.ListenAndServe(port, nil))
