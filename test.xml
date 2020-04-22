@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AmazonConfirmation>
+	<OrderId>AMZ162</OrderId>
+	<BStockCustomerId>54c35652421aa90e94a50e35</BStockCustomerId>
+	<CountryCode>US</CountryCode>
+	<ConfirmationStatus>SUCCESS</ConfirmationStatus>
+	<ErrorCode></ErrorCode>
+</AmazonConfirmation>
+
+
+# ConfirmationStatus will be SUCCESS or CANCELLED or ERROR
+# ErrorCode will be INVALID_CUSTOMER or INVALID_TAX_EXEMPTION or empty String

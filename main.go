@@ -1,11 +1,11 @@
 package main
 
 import (
-	"io/ioutil"
+	"fmt"
+	"go/importer"
 	"os"
+	"sync"
 
-	mts "github.com/arkrozycki/go-pigeon/protorepo/message-transfer"
-	"github.com/golang/protobuf/proto"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -29,30 +29,24 @@ func main() {
 		Msg("CONFIG")
 
 	if err := launchStatusCheck(&conf); err != nil {
-		panic(err) // launch must stop if we don't pass the checks
+		panic(err) // we must stop if we don't pass the checks
 	}
 
-	data, _ := ioutil.ReadFile("./771199.jpg")
-	msg := new(mts.MessageTransferRequested)
-	msg.ClientKey = "amz"
-	msg.MessageKey = "evt.amz.mts.order_file_received"
-	msg.Payload = data
-	msg.PayloadSize = int32(len(data))
-	msg.PayloadFilename = "771199_test_remote_send.jpg"
-	protoMsg, err := proto.Marshal(msg)
+	// startup API listener
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go Serve(":8080", &conf, &wg)
+	wg.Wait()
 
-	// decodedBody := new(mts.MessageTransferRequested)
-	// err = proto.Unmarshal(protoMsg, decodedBody)
-	// log.Printf("Decoded Body \t", decodedBody, "\n\n", "Original \t", data)
-
-	conn, err := Connect(&conf)
-	defer conn.Close()
-	ch, err := GetAMQPChannel(conn)
-	defer ch.Close()
-	err = Publish(ch, &conf.Publisher.Exchange, "cmd.amz.mts.send", protoMsg)
+	pkg, err := importer.Default().Import("protorepo/message-transfer")
 	if err != nil {
-		panic(err)
+		fmt.Println("error:", err)
+		return
 	}
+	for _, declName := range pkg.Scope().Names() {
+		fmt.Println(declName)
+	}
+
 }
 
 // launchStatusCheck ensures we have everything we need to startup

@@ -51,6 +51,5 @@ func Publish(ch *amqp.Channel, e *ExchangeConfig, routingKey string, msg []byte)
 			ContentType: "text/plain",
 			Body:        msg,
 		})
-
 	return err
 }
