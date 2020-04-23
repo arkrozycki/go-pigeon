@@ -118,6 +118,7 @@ func Consume(conf *Config) error {
 				Str("Redelivered", strconv.FormatBool(msg.Redelivered)).
 				Str("DeliveryTag", strconv.FormatUint(msg.DeliveryTag, 10)).
 				Str("RoutingKey", msg.RoutingKey).
+				Str("HeaderProto", msg.Headers["proto"].(string)).
 				Str("Body", string(msg.Body)).
 				Msg("PIGEON ARRIVED")
 		}
