@@ -20,7 +20,7 @@ func getProtoMessageByName(name string) (proto.Message, error) {
 	// 		MAP YOUR MESSAGE TYPE TO PROTOBUF BINDING HERE
 	// ------------------------------------------
 	switch name {
-	case "MessageTransferRequested":
+	case "mts.MessageTransferRequested":
 		return &mts.MessageTransferRequested{}, nil
 	default:
 		return nil, errors.New("Not found.")
@@ -58,7 +58,7 @@ func Emit(routingKey string, protoMessageName string, js []byte, conf *Config) e
 		Msg("PIGEON SENT")
 
 	// publish message
-	err = Publish(ch, &conf.Publisher.Exchange, routingKey, m)
+	err = Publish(ch, &conf.Publisher.Exchange, routingKey, protoMessageName, m)
 	if err != nil {
 		panic(err)
 	}
@@ -113,12 +113,16 @@ func Consume(conf *Config) error {
 	go func() {
 		// loop forever listening on channel
 		for msg := range msgs {
+			var header string
+			if msg.Headers["proto"] != nil {
+				header = msg.Headers["proto"].(string)
+			}
 			log.Info().
 				Str("Exchange", msg.Exchange).
 				Str("Redelivered", strconv.FormatBool(msg.Redelivered)).
 				Str("DeliveryTag", strconv.FormatUint(msg.DeliveryTag, 10)).
 				Str("RoutingKey", msg.RoutingKey).
-				Str("HeaderProto", msg.Headers["proto"].(string)).
+				Str("HeaderProto", header).
 				Str("Body", string(msg.Body)).
 				Msg("PIGEON ARRIVED")
 		}

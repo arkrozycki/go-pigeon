@@ -46,13 +46,17 @@ func CheckExchangeExists(ch *amqp.Channel, exchange ExchangeConfig) error {
 	return err
 }
 
-func Publish(ch *amqp.Channel, e *ExchangeConfig, routingKey string, msg []byte) error {
+func Publish(ch *amqp.Channel, e *ExchangeConfig, routingKey string, protoHeader string, msg []byte) error {
+	headers := amqp.Table{
+		"proto": protoHeader,
+	}
 	err := ch.Publish(
 		e.Name,
 		routingKey,
 		false,
 		false,
 		amqp.Publishing{
+			Headers:     headers,
 			ContentType: "text/plain",
 			Body:        msg,
 		})
