@@ -46,5 +46,10 @@ This package doesn't come with any protobuf schemas or bindings. You will have t
 What if you want to include binary data? Just Base64 the binary file, remove any line breaks.
 
 ```bash
-openssl base64 < path/to/file.png | tr -d '\n' | pbcopy
+openssl base64 < path/to/file.xml | tr -d '\n' | pbcopy # copies base64 string to clipboard
+stat -f%z file.xml # file size
 ```
+
+## Webhook
+
+You can configure a consumer to deliver messages to a HTTP endpoint. Under the `config.yml` section consumer > webhook. You can use services like requestbin or even turn up a local httpbin.
