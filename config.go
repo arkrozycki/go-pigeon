@@ -4,12 +4,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Config
 type Config struct {
 	Connection ConnectionConfig
 	Publisher  PublisherConfig
 	Consumer   ConsumerConfig
 }
 
+// ConnectionConfig
 type ConnectionConfig struct {
 	Host string
 	Port string
@@ -17,21 +19,29 @@ type ConnectionConfig struct {
 	Pass string
 }
 
+// PublisherConfig
 type PublisherConfig struct {
 	Exchange ExchangeConfig
 }
 
+// ConsumerConfig
+type ConsumerConfig struct {
+	Exchange ExchangeConfig
+	Queue    QueueConfig
+}
+
+// QueueConfig
+type QueueConfig struct {
+	Name     string
+	Bindings []string
+}
+
+// ExchangeConfig
 type ExchangeConfig struct {
 	Name       string
 	Type       string
 	Durable    bool
 	AutoDelete bool
-}
-
-type ConsumerConfig struct {
-	Exchange ExchangeConfig
-	Queue    string
-	Bindings []string
 }
 
 // GetConf will retrieve the configuration file at the location (f).

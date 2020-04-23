@@ -17,6 +17,11 @@ func Connect(c *Config) (*amqp.Connection, error) {
 // GetAMQPChannel
 func GetAMQPChannel(conn *amqp.Connection) (*amqp.Channel, error) {
 	channel, err := conn.Channel()
+	err = channel.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
 	return channel, err
 }
 

@@ -17,7 +17,8 @@ consumer:
     type: "topic"
     durable: true
     autoDelete: false
-  queue: "test_pigeon_q"
-  bindings: 
-    - "cmd.*.mts.*"
-    - "evt.*.mts.*"
+  queue: 
+    name: "test_pigeon_q"
+    bindings: 
+      - "cmd.*.mts.*"
+      - "evt.*.mts.*"

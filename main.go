@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/rs/zerolog"
@@ -30,10 +31,23 @@ func main() {
 		panic(err) // we must stop if we don't pass the checks
 	}
 
+	// load up any consumer
+	if err = Consume(&conf); err != nil {
+		panic(err)
+	}
+	log.Info().
+		Str("queue", conf.Consumer.Queue.Name).
+		Str("exchange", conf.Consumer.Exchange.Name).
+		Str("bindings", strings.Join(conf.Consumer.Queue.Bindings, " ")).
+		Msg("OK ... AMQP Queue")
+
 	// startup API listener
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go Serve(":8080", &conf, &wg)
+	log.Info().
+		Str("uri", "http://localhost:8080").
+		Msg("OK ... REST API")
 	wg.Wait()
 
 }
@@ -60,7 +74,9 @@ func launchStatusCheck(conf *Config) error {
 	if err := CheckExchangeExists(ch, conf.Publisher.Exchange); err != nil {
 		return err
 	}
-	log.Info().Msgf("OK ... AMQP Exchange %s exists", conf.Publisher.Exchange.Name)
+	log.Info().
+		Str("exchange", conf.Publisher.Exchange.Name).
+		Msg("OK ... AMQP Exchange")
 
 	return nil
 }
