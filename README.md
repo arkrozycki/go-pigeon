@@ -40,3 +40,11 @@ This package doesn't come with any protobuf schemas or bindings. You will have t
   }
 }
 ```
+
+### Binary Data
+
+What if you want to include binary data? Just Base64 the binary file, remove any line breaks.
+
+```bash
+openssl base64 < path/to/file.png | tr -d '\n' | pbcopy
+```
