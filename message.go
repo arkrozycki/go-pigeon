@@ -10,7 +10,7 @@ import (
 	// ------------------------------------------
 	// 		IMPORT YOUR PROTOBUF BINDINGS HERE
 	// ------------------------------------------
-	// mts "github.com/arkrozycki/go-pigeon/protorepo/message-transfer"
+	mts "github.com/arkrozycki/go-pigeon/protorepo-go/message-transfer"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -23,8 +23,10 @@ func getProtoMessageByName(name string) (proto.Message, error) {
 	// 		MAP YOUR MESSAGE TYPE TO PROTOBUF BINDING HERE
 	// ------------------------------------------
 	switch name {
-	// case "mts.MessageTransferRequested":
-	// return &mts.MessageTransferRequested{}, nil
+	case "mts.MessageTransferRequested":
+		return &mts.MessageTransferRequested{}, nil
+	case "mts.MessageTransferReceived":
+		return &mts.MessageTransferReceived{}, nil
 	default:
 		return nil, errors.New("Not found. ProtoBuf " + name)
 	}
