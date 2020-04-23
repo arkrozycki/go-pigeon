@@ -4,6 +4,9 @@ import (
 	"errors"
 	"strconv"
 
+	// ------------------------------------------
+	// 		IMPORT YOUR PROTOBUF BINDINGS HERE
+	// ------------------------------------------
 	mts "github.com/arkrozycki/go-pigeon/protorepo/message-transfer"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -13,6 +16,9 @@ import (
 
 // getProtoMessageByName
 func getProtoMessageByName(name string) (proto.Message, error) {
+	// ------------------------------------------
+	// 		MAP YOUR MESSAGE TYPE TO PROTOBUF BINDING HERE
+	// ------------------------------------------
 	switch name {
 	case "MessageTransferRequested":
 		return &mts.MessageTransferRequested{}, nil

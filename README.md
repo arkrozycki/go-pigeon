@@ -1,6 +1,35 @@
 # go-pigeon
-Helper for publishing messages using protobuf payloads
 
+Useful for testing message based microservices transported via RabbitMQ and serialized by protocol buffers.
+
+# Who might this help?
+If you need the ability to publish JSON messages via REST have them converted to protobuf message and then published to rabbitmq exchange.
+
+If you need the ability to attach a queue to an exchange with specific message bindings and have the incoming messages converted from protobuf to JSON and sent to a webhook.
+
+## Installation
+
+Just run docker-compose up and you should have service running and listening on port configured in `config.yml` by default `:8080`.
+
+```bash
+docker-compose up
+```
+
+## Configuration
+
+Configure your environment within the `config.yml` file.
+
+This package doesn't come with any protobuf schemas or bindings. You will have to provide your own. To do that you will need to:
+
+- edit the `message.go` source file
+- import your protobuf bindings (e.g. `myProtos "github.com/arkrozycki/protos")`
+- map your messages to the protobuf binding in the function `getProtoMessageByName`
+
+## API Message Specification
+
+- `proto` The protobuf message name (used for binding)
+- `routingKey` The routing_key for RabbitMQ
+- `msg` The JSON representation of the proto message. This object will be unmarshalled to a ProtoMessage and sent to RabbitMQ.
 
 ```json
 {
