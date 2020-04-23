@@ -169,10 +169,6 @@ func Consume(conf *Config) error {
 			}
 
 			// send json to webhook
-			log.Info().
-				Str("uri", conf.Consumer.Webhook.Uri).
-				Str("verb", conf.Consumer.Webhook.Verb).
-				Msg("WEBHOOK")
 			r := bytes.NewReader(json)
 			req, err := http.NewRequest(conf.Consumer.Webhook.Verb, conf.Consumer.Webhook.Uri, r)
 			req.Header.Set("Content-Type", "application/json")
@@ -190,11 +186,17 @@ func Consume(conf *Config) error {
 				continue
 			}
 			resp.Body.Close()
+
+			log.Info().
+				Str("uri", conf.Consumer.Webhook.Uri).
+				Str("verb", conf.Consumer.Webhook.Verb).
+				Str("statusCode", strconv.Itoa(resp.StatusCode)).
+				Msg("WEBHOOK")
+
 			if resp.StatusCode != 200 && resp.StatusCode != 201 {
 				log.Info().Str("err", "Remote did not return 200 or 201.").Msg("WEBHOOK")
 				continue
 			}
-			log.Info().Msg("WEBHOOK COMPLETE")
 
 		}
 	}()

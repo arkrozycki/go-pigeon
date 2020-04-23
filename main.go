@@ -14,7 +14,7 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Info().Msg("")
-	log.Info().Msgf("STARTING UP")
+	log.Info().Msgf("STARTING UP THE PIGEON COUP")
 
 	conf, err := GetConf("config.yml")
 	if err != nil {
@@ -25,7 +25,7 @@ func main() {
 		Str("host", conf.Connection.Host).
 		Str("port", conf.Connection.Port).
 		Str("user", conf.Connection.User).
-		Msg("CONFIG")
+		Msg("RABBITMQ CONFIG")
 
 	if err := launchStatusCheck(&conf); err != nil {
 		panic(err) // we must stop if we don't pass the checks
