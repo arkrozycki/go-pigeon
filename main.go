@@ -13,8 +13,8 @@ import (
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-
-	log.Info().Msg("STARTING UP")
+	log.Info().Msg("")
+	log.Info().Msgf("STARTING UP")
 
 	conf, err := GetConf("config.yml")
 	if err != nil {
@@ -32,9 +32,7 @@ func main() {
 	}
 
 	// load up any consumer
-	if err = Consume(&conf); err != nil {
-		panic(err)
-	}
+	go Consume(&conf)
 	log.Info().
 		Str("queue", conf.Consumer.Queue.Name).
 		Str("exchange", conf.Consumer.Exchange.Name).

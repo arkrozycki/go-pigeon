@@ -28,6 +28,7 @@ type PublisherConfig struct {
 type ConsumerConfig struct {
 	Exchange ExchangeConfig
 	Queue    QueueConfig
+	Webhook  WebhookConfig
 }
 
 // QueueConfig
@@ -42,6 +43,12 @@ type ExchangeConfig struct {
 	Type       string
 	Durable    bool
 	AutoDelete bool
+}
+
+// WebhookConfig
+type WebhookConfig struct {
+	Uri  string
+	Verb string
 }
 
 // GetConf will retrieve the configuration file at the location (f).

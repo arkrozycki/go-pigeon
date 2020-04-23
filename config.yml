@@ -22,3 +22,6 @@ consumer:
     bindings: 
       - "cmd.*.mts.*"
       - "evt.*.mts.*"
+  webhook:
+    uri: "https://en1afw1159g0f.x.pipedream.net" # use requestbin or httpbin for testing
+    verb: "POST"

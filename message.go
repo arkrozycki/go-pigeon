@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"errors"
+	"net/http"
 	"strconv"
+	"sync"
 
 	// ------------------------------------------
 	// 		IMPORT YOUR PROTOBUF BINDINGS HERE
@@ -54,7 +57,7 @@ func Emit(routingKey string, protoMessageName string, js []byte, conf *Config) e
 	log.Info().
 		Str("routingKey", routingKey).
 		Str("proto", protoMessageName).
-		Str("msg", string(js)).
+		// Str("msg", string(js)).
 		Msg("PIGEON SENT")
 
 	// publish message
@@ -70,9 +73,9 @@ func Emit(routingKey string, protoMessageName string, js []byte, conf *Config) e
 func Consume(conf *Config) error {
 	// setup rabbit
 	conn, err := Connect(conf)
-	// defer conn.Close()
+	defer conn.Close()
 	ch, err := GetAMQPChannel(conn)
-	// defer ch.Close()
+	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
 		conf.Consumer.Queue.Name, // name
@@ -86,6 +89,7 @@ func Consume(conf *Config) error {
 		return err
 	}
 
+	// loop over bindings configs and bind all routing keys to queue
 	for _, binding := range conf.Consumer.Queue.Bindings {
 		err = ch.QueueBind(
 			conf.Consumer.Queue.Name,    // queue name
@@ -110,23 +114,91 @@ func Consume(conf *Config) error {
 		nil,    // args
 	)
 
+	var wg sync.WaitGroup
+	wg.Add(1)
+
 	go func() {
+		defer wg.Done() // basically never
 		// loop forever listening on channel
 		for msg := range msgs {
 			var header string
 			if msg.Headers["proto"] != nil {
 				header = msg.Headers["proto"].(string)
 			}
+
 			log.Info().
 				Str("Exchange", msg.Exchange).
 				Str("Redelivered", strconv.FormatBool(msg.Redelivered)).
 				Str("DeliveryTag", strconv.FormatUint(msg.DeliveryTag, 10)).
 				Str("RoutingKey", msg.RoutingKey).
 				Str("HeaderProto", header).
-				Str("Body", string(msg.Body)).
+				// Str("Body", string(msg.Body)).
 				Msg("PIGEON ARRIVED")
+
+			// no header, no marshal
+			if header == "" {
+				continue
+			}
+
+			var p protoreflect.ProtoMessage
+			p, err := getProtoMessageByName(header)
+			if err != nil {
+				log.Err(err)
+				continue
+			}
+			// wire to proto
+			err = proto.Unmarshal(msg.Body, p)
+			if err != nil {
+				log.Err(err)
+				continue
+			}
+
+			// proto to json
+			json, err := protojson.Marshal(p)
+			if err != nil {
+				log.Err(err)
+				continue
+			}
+			// log.Info().
+			// 	Str("json", string(json)).
+			// 	Msg("Body")
+
+			// if we dont have a webhook config ignore the rest
+			if conf.Consumer.Webhook.Uri == "" {
+				continue
+			}
+
+			// send json to webhook
+			log.Info().
+				Str("uri", conf.Consumer.Webhook.Uri).
+				Str("verb", conf.Consumer.Webhook.Verb).
+				Msg("WEBHOOK")
+			r := bytes.NewReader(json)
+			req, err := http.NewRequest(conf.Consumer.Webhook.Verb, conf.Consumer.Webhook.Uri, r)
+			req.Header.Set("Content-Type", "application/json")
+
+			client := &http.Client{}
+			resp, err := client.Do(req)
+			if err != nil {
+				log.Err(err)
+				continue
+			}
+			bod := &bytes.Buffer{}
+			_, err = bod.ReadFrom(resp.Body)
+			if err != nil {
+				log.Err(err)
+				continue
+			}
+			resp.Body.Close()
+			if resp.StatusCode != 200 && resp.StatusCode != 201 {
+				log.Info().Str("err", "Remote did not return 200 or 201.").Msg("WEBHOOK")
+				continue
+			}
+			log.Info().Msg("WEBHOOK COMPLETE")
+
 		}
 	}()
 
+	wg.Wait()
 	return nil
 }

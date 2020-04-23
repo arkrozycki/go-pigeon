@@ -14,5 +14,6 @@ services:
     restart: on-failure
     ports:
       - "8080:8080"
+      
 volumes:
   go-modules:
