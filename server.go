@@ -53,7 +53,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// all good, or all bad
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`:(`))
+		w.Write([]byte(err.Error()))
 	} else {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`OK`))

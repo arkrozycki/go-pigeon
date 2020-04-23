@@ -26,7 +26,7 @@ func getProtoMessageByName(name string) (proto.Message, error) {
 	// case "mts.MessageTransferRequested":
 	// return &mts.MessageTransferRequested{}, nil
 	default:
-		return nil, errors.New("Not found.")
+		return nil, errors.New("Not found. ProtoBuf " + name)
 	}
 
 }
@@ -35,6 +35,9 @@ func getProtoMessageByName(name string) (proto.Message, error) {
 func Emit(routingKey string, protoMessageName string, js []byte, conf *Config) error {
 	var msg protoreflect.ProtoMessage
 	msg, err := getProtoMessageByName(protoMessageName)
+	if err != nil {
+		return err
+	}
 
 	// Unmarshal the json to protomessage
 	err = protojson.Unmarshal(js, msg)
